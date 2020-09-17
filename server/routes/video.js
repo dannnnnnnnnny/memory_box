@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-// const { Video } = require("../models/Video");
+const { Video } = require("../models/Video");
 
 const { auth } = require("../middleware/auth");
 const multer = require("multer");
@@ -34,6 +34,20 @@ const upload = multer({ storage: storage, fileFilter:fileFilter }).single("file"
 //=================================
 //             Video
 //=================================
+
+
+router.post("/uploadVideo", (req, res) => {
+
+    const video = new Video(req.body) // client에서 넘어온 variables(writer,title,description....)
+                                      // 다 받아옴
+
+    video.save((err, doc)=> {
+        if(err)
+            return res.json({ success: false, err })
+        res.status(200).json({ success: true })
+    })
+    
+});
 
 
 router.post("/uploadfiles", (req, res) => {
