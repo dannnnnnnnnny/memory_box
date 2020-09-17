@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { Typography, Button, Form, message, Input, Icon } from 'antd';
 import Dropzone from 'react-dropzone';
-import { set } from 'mongoose';
+import Axios from "axios";
+
 const { TextArea } = Input;
 const { Title } = Typography;
+
 
 const PrivateOptions = [
     { value: 0, label: "Private" },
@@ -24,27 +26,78 @@ function VideoUploadPage() {
     const [Description, setDescription] = useState("")
     const [Private, setPrivate] = useState(0)
     const [Category, setCategory] = useState("Film & Animation")
+    const [FilePath, setFilePath] = useState("")
+    const [Duration, setDuration] = useState("")
+    const [ThumbnailPath, setThumbnailPath] = useState("")
 
-    
     const onVideoTitleChange = (e) => {
         setVideoTitle(e.currentTarget.value)
     }
+
 
     const onDescriptionChange = (e) => {
         setDescription(e.currentTarget.value)
     }
 
+
     const onPrivateChange = (e) => {
         setPrivate(e.currentTarget.value)
     }
+
 
     const onCategoryChange = (e) => {
         setCategory(e.currentTarget.value)
     }
 
+
+    const onDrop = (files) => {
+        let formData = new FormData;
+        
+        const config = {
+            header: {'content-type': 'multipart/form-data'}
+        }
+
+        formData.append('file', files[0])
+
+        Axios.post('/api/video/uploadfiles', formData, config)
+            .then(response => {
+
+                if(response.data.success) {
+                    console.log("비디오 : ", response.data)
+
+                    let variable = {
+                        filePath: response.data.filePath,
+                        fileName: response.data.fileName
+                    }
+
+                    setFilePath(response.data.filePath)
+
+                    Axios.post('/api/video/thumbnail', variable)
+                        .then(response => {
+                            if(response.data.success) {
+                                
+                                setDuration(response.data.fileDuration)
+                                setThumbnailPath(response.data.thumbsFilePath)
+                            } else {
+                                
+                                alert('썸네일 생성 실패');
+                            
+                            }
+                        })
+
+                } else {
+
+                    alert('비디오 업로드 실패')
+                }
+
+            })
+    }
+
+
     const onSubmitHandler = () => {
 
     }
+
 
     return (
         <div style={{ maxWidth:'700px', margin:'2rem auto'}}>
@@ -53,9 +106,15 @@ function VideoUploadPage() {
             </div>
 
             <Form onSubmit>
-                <div style={{display:'flex', justifyContent:'space-between'}}>
+                <div style={{display:'flex', justifyContent:'space-between'}}>                    
+                    
                     {/* Drop Zone */}
-                    <Dropzone onDrop multiple maxSize>
+
+                    <Dropzone 
+                        onDrop={onDrop}
+                        multiple={false}
+                        maxSize={1000000000}
+                    >
                         {({ getRootProps, getInputProps}) => (
                             <div style={{ width: '300px', height: '240px', border:'1px solid lightgray', display:'flex',
                             alignItems:'center', justifyContent:'center'}} {...getRootProps()}>
@@ -63,11 +122,17 @@ function VideoUploadPage() {
                                 <Icon type='plus' style={{ fontSize:'3rem'}} />
                             </div>
                         )}
+
                     </Dropzone>
+                    
                     {/* Thumbnail */}
-                    <div>
-                        <img src alt />
-                    </div>
+
+                    {ThumbnailPath && 
+                        <div>
+                            <img src={`http://localhost:5000/${ThumbnailPath}`} alt="thumbnail" />
+                        </div>
+                    }
+
                 </div>
 
                 <br />
