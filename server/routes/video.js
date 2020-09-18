@@ -63,6 +63,21 @@ router.get("/getVideos", (req, res) => {
 });
 
 
+router.post("/getVideoDetail", (req, res) => {
+
+    // const video = new Video(req.body.videoId)
+
+    Video.findOne({ "_id": req.body.videoId })
+        .populate('writer') // 유저의 모든 정보 가져옴
+        .exec((err, videoDetail) => {
+            if(err)
+                return res.status(400).send(err);
+            res.status(200).json({ success: true, videoDetail })
+        })
+    
+});
+
+
 
 router.post("/uploadfiles", (req, res) => {
 
