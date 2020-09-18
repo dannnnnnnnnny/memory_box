@@ -49,6 +49,20 @@ router.post("/uploadVideo", (req, res) => {
     
 });
 
+router.get("/getVideos", (req, res) => {
+
+    // 비디오를 DB에서 가져와서 클라이언트에 보냄
+    
+    Video.find() // 모든 비디오 가져옴
+        .populate('writer') // populate를 해줘야 writer에 연결된 user 정보를 가져올 수 있음.
+        .exec((err, videos)=> {
+            if(err)
+                return res.status(400).send(err);
+            res.status(200).json({ success: true, videos })
+        })
+});
+
+
 
 router.post("/uploadfiles", (req, res) => {
 
