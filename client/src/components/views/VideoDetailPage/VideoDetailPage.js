@@ -3,6 +3,7 @@ import { Row, Col, List, Avatar } from 'antd';
 import Axios from 'axios';
 import SideVideo from './Sections/SideVideo';
 import Subscribe from './Sections/Subscribe';
+import Comment from './Sections/Comment';
 
 function VideoDetailPage(props) {
 
@@ -33,18 +34,23 @@ function VideoDetailPage(props) {
                     <div style={{ width: '100%', padding: '3rem 4rem'}}>
                         <video style={{ width: '100%' }} src={`http://localhost:5000/${Video.filePath}`} controls />
                         <List.Item
-                            actions={[<Subscribe userTo={Video.writer._id} userFrom={localStorage.getItem('userId')} />]} // 구독 버튼
+                            actions={Video.writer._id === localStorage.getItem('userId') ? [''] : [<Subscribe userTo={Video.writer._id} userFrom={localStorage.getItem('userId')} />]} 
+                            // 구독 버튼
+                            // 로그인을 하면 브라우저의 local Storage에 userId가 저장됨
                         >
                             <List.Item.Meta
                                 avatar={Video.writer && <Avatar src={Video.writer.image} />}
                                 title={Video.title}
                                 description={Video.description}
                             />
-    
-                            {/* comments */}
-                            
+
                         </List.Item>
+
+                        {/* comments */}
+                        <Comment />
+
                     </div>
+
                 </Col>
                 <Col lg={6} xs={24}>
                     <SideVideo />
