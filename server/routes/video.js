@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { Video } = require("../models/Video");
+const { Subscribe } = require("../models/Subscribe");
 
 const { auth } = require("../middleware/auth");
 const multer = require("multer");
 const path = require('path');
-const ffmpeg = require('fluent-ffmpeg')
-
+const ffmpeg = require('fluent-ffmpeg');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -61,6 +61,41 @@ router.get("/getVideos", (req, res) => {
             res.status(200).json({ success: true, videos })
         })
 });
+
+
+
+router.post("/getSubscriptionVideos", (req, res) => {
+
+    // 자신의 Id를 가지고 구독하는 사람들 찾기
+    Subscribe.find({ userFrom: req.body.userFrom })
+        .exec(( err, subscriberInfo ) => {
+            if(err) 
+                return res.status(400).send(err);
+            
+
+            // userTo의 유저들이 자신이 구독하는 사람들
+            let subscribedUser = [];
+
+            subscriberInfo.map((subscriber, i) => {
+                subscribedUser.push(subscriber.userTo);
+            })
+
+            // 찾은 사람들의 비디오를 가져옴
+            Video.find({ writer: { $in: subscribedUser }}) // subscribedUser의 모든 사람들에 대해 찾음
+                .populate('writer')
+                .exec((err, videos) => {
+                    if(err)
+                        return res.status(400).send(err);
+                    return res.status(200).json({ success: true, videos })
+                })
+
+        })
+
+    
+    
+    
+});
+
 
 
 router.post("/getVideoDetail", (req, res) => {
