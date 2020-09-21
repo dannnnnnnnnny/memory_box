@@ -33,7 +33,7 @@ function VideoDetailPage(props) {
                     <div style={{ width: '100%', padding: '3rem 4rem'}}>
                         <video style={{ width: '100%' }} src={`http://localhost:5000/${Video.filePath}`} controls />
                         <List.Item
-                            actions={[<Subscribe userTo={Video.writer._id}/>]} // 구독
+                            actions={[<Subscribe userTo={Video.writer._id} userFrom={localStorage.getItem('userId')} />]} // 구독 버튼
                         >
                             <List.Item.Meta
                                 avatar={Video.writer && <Avatar src={Video.writer.image} />}
