@@ -30,7 +30,7 @@ function SingleComment(props) {
         const variables = {
             content: CommentValue,
             writer: user.userData._id,
-            postId: props.videoId,
+            postId: props.postId,
             responseTo: props.comment._id 
         }
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Axios from 'axios'
 import SingleComment from './SingleComment'
+import ReplyComment from './ReplyComment'
 import { useSelector } from 'react-redux';
 
 import {
@@ -14,7 +15,7 @@ const { TextArea } = Input;
 
 
 function Comment(props) {
-    const videoId = props.videoId
+    const postId = props.videoId
     const user = useSelector(state => state.user)   // state에서 user정보를 가져옴 (redux)
     const [commentValue, setcommentValue] = useState('')
 
@@ -28,7 +29,7 @@ function Comment(props) {
         const variables = {
             content: commentValue,
             writer: user.userData._id,
-            postId: videoId,
+            postId: postId,
         }
 
         Axios.post('/api/comment/saveComment', variables)
@@ -53,7 +54,10 @@ function Comment(props) {
 
             {props.commentLists && props.commentLists.map((comment, index) => (
                 (!comment.responseTo &&
-                    <SingleComment refreshFunction={props.refreshFunction} comment={comment} videoId={videoId} key={index} />
+                    <React.Fragment key={index}>
+                        <SingleComment refreshFunction={props.refreshFunction} comment={comment} postId={postId} />
+                        <ReplyComment parentCommentId={comment._id} commentLists={props.commentLists} postId={postId} />
+                    </React.Fragment>
                 )
                 
             ))}
