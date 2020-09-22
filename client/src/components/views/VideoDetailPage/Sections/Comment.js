@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
 import Axios from 'axios'
-import { useSelector } from 'react-redux'
+import SingleComment from './SingleComment'
+import { useSelector } from 'react-redux';
 
 import {
     Form,
     Input,
     Button,
   } from 'antd';
+
 
 const { TextArea } = Input;
 
@@ -16,11 +18,9 @@ function Comment(props) {
     const user = useSelector(state => state.user)   // state에서 user정보를 가져옴 (redux)
     const [commentValue, setcommentValue] = useState('')
 
-
     const handleClick = (e) => {
         setcommentValue(e.currentTarget.value)
     }
-
 
     const onSubmit = (e) => {
         e.preventDefault()
@@ -35,11 +35,12 @@ function Comment(props) {
             .then(response=> {
                 if(response.data.success) {
                     console.log(response.data.result)
+                    props.refreshFunction(response.data.result)
+                    setcommentValue('')
                 } else {
                     alert('코멘트를 저장하지 못했습니다.')
                 }
             })
-
     }
 
     return (
@@ -49,6 +50,14 @@ function Comment(props) {
             <hr />
 
             {/* Comment Lists */}
+
+            {props.commentLists && props.commentLists.map((comment, index) => (
+                (!comment.responseTo &&
+                    <SingleComment refreshFunction={props.refreshFunction} comment={comment} videoId={videoId} key={index} />
+                )
+                
+            ))}
+            
 
             {/* Root Comment Form */}
 

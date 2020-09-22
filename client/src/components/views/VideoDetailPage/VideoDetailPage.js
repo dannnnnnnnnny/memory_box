@@ -23,11 +23,25 @@ function VideoDetailPage(props) {
                     alert('비디오 정보 가져오기 실패')
                 }
             })
+
+        Axios.post('/api/comment/getComments', variable)
+            .then(response => {
+                if(response.data.success) {
+                    // console.log("#댓 목록 : ", response.data.comments)
+                    setComments(response.data.comments)
+                } else {
+                    alert('Comment 정보를 가져오는 데 실패했습니다.')
+                }
+            }) 
+        
     }, [])
 
-    // console.log(Video);
-    // console.log(Video.writer);
 
+    const refreshFunction = (newComment) => {
+        setComments(Comments.concat(newComment))
+    };
+
+    
     if (Video.writer) {
         return (
             <Row>
@@ -48,7 +62,7 @@ function VideoDetailPage(props) {
                         </List.Item>
 
                         {/* comments */}
-                        <Comment videoId={videoId} />
+                        <Comment refreshFunction={refreshFunction} commentLists={Comments} videoId={videoId} />
 
                     </div>
 
