@@ -3,6 +3,7 @@ import { Comment, Avatar, Button, Input, Tooltip } from 'antd'
 import moment from 'moment';
 import { useSelector} from 'react-redux'
 import Axios from 'axios';
+import LikeDislikes from './LikeDislikes';
 
 const { TextArea } = Input;
 
@@ -21,6 +22,7 @@ function SingleComment(props) {
     }
 
     const actions = [
+        <LikeDislikes comment commentId={props.comment._id} userId={user.userData._id } />,
         <span onClick={onClickReplyOpen} key="comment-basic-reply-to">Reply to</span>
     ]
 
@@ -40,6 +42,7 @@ function SingleComment(props) {
                     console.log(response.data.result)
                     props.refreshFunction(response.data.result)
                     setCommentValue('')
+                    setOpenReply(!OpenReply)
                 } else {
                     alert('코멘트를 저장하지 못했습니다.')
                 }
