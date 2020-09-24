@@ -22,7 +22,7 @@ function SingleComment(props) {
     }
 
     const actions = [
-        <LikeDislikes comment commentId={props.comment._id} userId={user.userData._id } />,
+        <LikeDislikes comment commentId={props.comment && props.comment._id} userId={user.userData._id } />,
         <span onClick={onClickReplyOpen} key="comment-basic-reply-to">Reply to</span>
     ]
 

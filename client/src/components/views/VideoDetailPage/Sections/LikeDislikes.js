@@ -9,7 +9,7 @@ function LikeDislikes(props) {
     const [LikeAction, setLikeAction] = useState(null)
     const [DislikeAction, setDislikeAction] = useState(null)
 
-    let variable = {}
+    let variable = {};
 
     if (props.video) {
         variable = { videoId: props.videoId, userId: props.userId }
@@ -39,6 +39,11 @@ function LikeDislikes(props) {
                 }
             })
 
+        
+
+    }, [Likes])
+
+    useEffect(() => {
         Axios.post('/api/like/getDislikes', variable)
             .then(response => {
                 console.log('getDislike',response.data)
@@ -56,8 +61,83 @@ function LikeDislikes(props) {
                     alert('Failed to get dislikes')
                 }
             })
+    }, [Dislikes])
 
-    }, [])
+
+    const onLike = () => {
+
+        if (LikeAction === null) {
+
+            Axios.post('/api/like/upLike', variable)
+                .then(response => {
+                    if (response.data.success) {
+
+                        setLikes(Likes + 1)
+                        setLikeAction('liked')
+
+                        //If dislike button is already clicked
+
+                        if (DislikeAction !== null) {
+                            setDislikeAction(null)
+                            setDislikes(Dislikes - 1)
+                        }
+
+
+                    } else {
+                        alert('Failed to increase the like')
+                    }
+                })
+
+
+        } else {
+
+            Axios.post('/api/like/unLike', variable)
+                .then(response => {
+                    if (response.data.success) {
+
+                        setLikes(Likes - 1)
+                        setLikeAction(null)
+
+                    } else {
+                        alert('Failed to decrease the like')
+                    }
+                })
+
+        }
+
+    }
+
+    const onDislike = () => {
+        if(DislikeAction !== null) {
+            Axios.post('/api/like/unDisLike', variable)
+            .then(response => {
+                if (response.data.success) {
+
+                    setDislikes(Dislikes - 1)
+                    setDislikeAction(null)
+
+                } else {
+                alert('dislike 지우기 실패')
+                }
+            })
+        } else {
+            Axios.post('/api/like/upDislike', variable)
+            .then(response => {
+                if(response.data.success) {
+                    setDislikes(Dislikes + 1)
+                    setDislikeAction('disliked')
+
+                    if(LikeAction !== null) {
+                        setLikeAction(null)
+                        setLikeAction(Likes - 1)
+                    }
+                } else {
+                    alert('Like 내리기 실패')
+                }
+            })
+        }
+    }
+
 
     return (
         <div>
@@ -66,7 +146,7 @@ function LikeDislikes(props) {
                 <Tooltip title="Like">
                     <Icon type="like" 
                         theme= {LikeAction === 'liked' ? "filled": "outlined"}
-                        onClick
+                        onClick={onLike}
                     />
                 </Tooltip>
                 <span style={{ paddingLeft:'8px', cursor:'auto' }}> {Likes} </span>
@@ -76,7 +156,7 @@ function LikeDislikes(props) {
                 <Tooltip title="Dislike">
                     <Icon type="dislike" 
                         theme={DislikeAction === 'disliked' ? "filled": "outlined"}
-                        onClick
+                        onClick={onDislike}
                     />
                 </Tooltip>
                 <span style={{ paddingLeft:'8px', cursor:'auto' }}> {Dislikes} </span>
